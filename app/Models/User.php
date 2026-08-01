@@ -111,4 +111,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class)->whereNull('read_at');
     }
+
+
 }

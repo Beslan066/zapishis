@@ -15,163 +15,175 @@
                     Запишись
                 </span>
                 </a>
-                <p class="text-gray-500 text-sm mt-2">Создайте аккаунт и подтвердите номер телефона</p>
+                <p class="text-gray-500 text-sm mt-2">Создайте аккаунт</p>
             </div>
 
-            <!-- Форма регистрации -->
-            <div class="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-xl shadow-gray-100/50">
-                <!-- Шаг 1: Форма регистрации -->
-                <div id="stepRegister">
-                    <form id="registerForm" class="space-y-4">
-                        @csrf
+            <!-- Шаг 0: Выбор роли -->
+            <div id="stepRole" class="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-xl shadow-gray-100/50">
+                <h2 class="text-xl font-bold text-gray-900 text-center mb-6">Выберите тип аккаунта</h2>
 
-                        <div>
-                            <label for="name" class="block text-sm font-semibold text-gray-700 mb-1.5">Как к вам обращаться? *</label>
-                            <input id="name" type="text" name="name" value="{{ old('name') }}" required
-                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                   placeholder="Иван Иванов">
-                            <div id="nameError" class="mt-1 text-sm text-rose-600 hidden"></div>
-                        </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Клиент -->
+                    <button type="button" id="selectClient" class="group p-6 bg-gray-50/80 rounded-2xl border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50/50 transition-all text-center">
+                        <div class="text-4xl mb-3 group-hover:scale-110 transition">👤</div>
+                        <h3 class="font-bold text-gray-900">Клиент</h3>
+                        <p class="text-xs text-gray-400 mt-1">Искать услуги и записываться</p>
+                    </button>
 
-                        <div>
-                            <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1.5">Номер телефона *</label>
-                            <div class="relative">
-                                <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required
-                                       class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                       placeholder="+7 999 123 45 67">
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">SMS</span>
-                            </div>
-                            <div id="phoneError" class="mt-1 text-sm text-rose-600 hidden"></div>
-                        </div>
+                    <!-- Бизнес -->
+                    <button type="button" id="selectBusiness" class="group p-6 bg-gray-50/80 rounded-2xl border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50/50 transition-all text-center">
+                        <div class="text-4xl mb-3 group-hover:scale-110 transition">🏢</div>
+                        <h3 class="font-bold text-gray-900">Бизнес</h3>
+                        <p class="text-xs text-gray-400 mt-1">Принимать записи и управлять</p>
+                    </button>
+                </div>
+            </div>
 
-                        <div>
-                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email *</label>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                   placeholder="beslan@example.com">
-                            <div id="emailError" class="mt-1 text-sm text-rose-600 hidden"></div>
-                        </div>
-
-                        <div>
-                            <label for="password" class="block text-sm font-semibold text-gray-700 mb-1.5">Пароль *</label>
-                            <div class="relative">
-                                <input id="password" type="password" name="password" required
-                                       class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                       placeholder="Минимум 8 символов">
-                                <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div id="passwordError" class="mt-1 text-sm text-rose-600 hidden"></div>
-                            <p class="mt-1 text-xs text-gray-400">Пароль должен содержать минимум 8 символов</p>
-                        </div>
-
-                        <div>
-                            <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1.5">Подтвердите пароль *</label>
-                            <input id="password_confirmation" type="password" name="password_confirmation" required
-                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                   placeholder="Повторите пароль">
-                            <div id="passwordConfirmationError" class="mt-1 text-sm text-rose-600 hidden"></div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <input id="terms" type="checkbox" required
-                                   class="mt-0.5 w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                            <label for="terms" class="text-sm text-gray-500">
-                                Я соглашаюсь с
-                                <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">условиями использования</a>
-                                и
-                                <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">политикой конфиденциальности</a>
-                            </label>
-                        </div>
-
-                        <button type="button" id="registerBtn" class="w-full px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-[1.02]">
-                            Зарегистрироваться
-                        </button>
-
-                        <div class="text-center">
-                            <p class="text-sm text-gray-500">
-                                Уже есть аккаунт?
-                                <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-700 font-medium transition">
-                                    Войти
-                                </a>
-                            </p>
-                        </div>
-                    </form>
+            <!-- Шаг 1: Форма регистрации -->
+            <div id="stepRegister" class="hidden bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-xl shadow-gray-100/50">
+                <div class="flex items-center gap-3 mb-6">
+                    <button type="button" id="backToRole" class="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                    </button>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900">Заполните данные</h2>
+                        <p class="text-sm text-gray-500" id="roleLabel">Регистрация как <span class="font-semibold text-indigo-600">Клиент</span></p>
+                    </div>
                 </div>
 
-                <!-- Шаг 2: Подтверждение SMS -->
-                <div id="stepVerify" class="hidden">
-                    <div class="text-center mb-6">
-                        <div class="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900">Подтвердите номер телефона</h3>
-                        <p class="text-sm text-gray-500 mt-1">
-                            Мы отправили SMS с кодом на номер <br>
-                            <strong id="verifyPhoneDisplay" class="text-gray-900">+7 999 123 45 67</strong>
-                        </p>
+                <form id="registerForm" class="space-y-4">
+                    @csrf
+                    <input type="hidden" id="selectedRole" name="role" value="client">
+
+                    <div>
+                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-1.5">Как к вам обращаться? *</label>
+                        <input id="name" type="text" name="name" value="{{ old('name') }}" required
+                               class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
+                               placeholder="Иван Иванов">
+                        <div id="nameError" class="mt-1 text-sm text-rose-600 hidden"></div>
                     </div>
 
-                    <form id="verifyForm" class="space-y-4">
-                        @csrf
-                        <input type="hidden" id="verifyPhone" name="phone">
-                        <input type="hidden" id="verifyName" name="name">
-                        <input type="hidden" id="verifyEmail" name="email">
-                        <input type="hidden" id="verifyPassword" name="password">
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Я хочу</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="relative flex items-center gap-3 p-4 bg-gray-50/80 rounded-2xl border-2 border-transparent hover:border-indigo-300 cursor-pointer transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50/50">
-                                    <input type="radio" name="role" value="client" checked class="w-4 h-4 text-indigo-600">
-                                    <div>
-                                        <p class="font-medium text-gray-900 text-sm">Записаться</p>
-                                        <p class="text-xs text-gray-400">Искать услуги и записываться</p>
-                                    </div>
-                                </label>
-                                <label class="relative flex items-center gap-3 p-4 bg-gray-50/80 rounded-2xl border-2 border-transparent hover:border-indigo-300 cursor-pointer transition has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50/50">
-                                    <input type="radio" name="role" value="business" class="w-4 h-4 text-indigo-600">
-                                    <div>
-                                        <p class="font-medium text-gray-900 text-sm">Управлять бизнесом</p>
-                                        <p class="text-xs text-gray-400">Принимать записи и управлять</p>
-                                    </div>
-                                </label>
-                            </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1.5">Номер телефона *</label>
+                        <div class="relative">
+                            <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required
+                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
+                                   placeholder="+7 999 123 45 67">
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">SMS</span>
                         </div>
+                        <div id="phoneError" class="mt-1 text-sm text-rose-600 hidden"></div>
+                    </div>
 
-                        <div>
-                            <label for="sms_code" class="block text-sm font-semibold text-gray-700 mb-1.5">Введите код из SMS</label>
-                            <div class="flex flex-col sm:flex-row gap-3">
-                                <div class="flex-1">
-                                    <input id="sms_code" type="text" maxlength="6" required
-                                           class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none text-center text-2xl font-bold tracking-[0.5em]"
-                                           placeholder="••••••">
-                                </div>
-                                <button type="button" id="resendCodeBtn" class="px-4 py-3 text-indigo-600 hover:text-indigo-700 font-medium text-sm whitespace-nowrap transition border border-indigo-200 rounded-2xl hover:bg-indigo-50">
-                                    Отправить повторно
-                                </button>
-                            </div>
-                            <div id="smsError" class="mt-1 text-sm text-rose-600 hidden"></div>
-                            <div id="smsSuccess" class="mt-1 text-sm text-emerald-600 hidden"></div>
-                        </div>
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email *</label>
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                               class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
+                               placeholder="beslan@example.com">
+                        <div id="emailError" class="mt-1 text-sm text-rose-600 hidden"></div>
+                    </div>
 
-                        <button type="button" id="verifyBtn" class="w-full px-6 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">
-                            Подтвердить и войти
-                        </button>
-
-                        <div class="text-center">
-                            <button type="button" id="backToRegister" class="text-sm text-gray-500 hover:text-gray-700 transition">
-                                ← Вернуться к регистрации
+                    <div>
+                        <label for="password" class="block text-sm font-semibold text-gray-700 mb-1.5">Пароль *</label>
+                        <div class="relative">
+                            <input id="password" type="password" name="password" required
+                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
+                                   placeholder="Минимум 8 символов">
+                            <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
                             </button>
                         </div>
-                    </form>
+                        <div id="passwordError" class="mt-1 text-sm text-rose-600 hidden"></div>
+                        <p class="mt-1 text-xs text-gray-400">Пароль должен содержать минимум 8 символов</p>
+                    </div>
+
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1.5">Подтвердите пароль *</label>
+                        <input id="password_confirmation" type="password" name="password_confirmation" required
+                               class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
+                               placeholder="Повторите пароль">
+                        <div id="passwordConfirmationError" class="mt-1 text-sm text-rose-600 hidden"></div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <input id="terms" type="checkbox" required
+                               class="mt-0.5 w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                        <label for="terms" class="text-sm text-gray-500">
+                            Я соглашаюсь с
+                            <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">условиями использования</a>
+                            и
+                            <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">политикой конфиденциальности</a>
+                        </label>
+                    </div>
+
+                    <button type="button" id="registerBtn" class="w-full px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-semibold shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-[1.02]">
+                        Зарегистрироваться
+                    </button>
+
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">
+                            Уже есть аккаунт?
+                            <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-700 font-medium transition">
+                                Войти
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Шаг 2: Подтверждение SMS -->
+            <div id="stepVerify" class="hidden bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-xl shadow-gray-100/50">
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Подтвердите номер телефона</h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Мы отправили SMS с кодом на номер <br>
+                        <strong id="verifyPhoneDisplay" class="text-gray-900">+7 999 123 45 67</strong>
+                    </p>
                 </div>
+
+                <form id="verifyForm" class="space-y-4">
+                    @csrf
+                    <input type="hidden" id="verifyPhone" name="phone">
+                    <input type="hidden" id="verifyName" name="name">
+                    <input type="hidden" id="verifyEmail" name="email">
+                    <input type="hidden" id="verifyPassword" name="password">
+                    <input type="hidden" id="verifyRole" name="role">
+
+                    <div>
+                        <label for="sms_code" class="block text-sm font-semibold text-gray-700 mb-1.5">Введите код из SMS</label>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="flex-1">
+                                <input id="sms_code" type="text" maxlength="6" required
+                                       class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none text-center text-2xl font-bold tracking-[0.5em]"
+                                       placeholder="••••••">
+                            </div>
+                            <button type="button" id="resendCodeBtn" class="px-4 py-3 text-indigo-600 hover:text-indigo-700 font-medium text-sm whitespace-nowrap transition border border-indigo-200 rounded-2xl hover:bg-indigo-50">
+                                Отправить повторно
+                            </button>
+                        </div>
+                        <div id="smsError" class="mt-1 text-sm text-rose-600 hidden"></div>
+                        <div id="smsSuccess" class="mt-1 text-sm text-emerald-600 hidden"></div>
+                    </div>
+
+                    <button type="button" id="verifyBtn" class="w-full px-6 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">
+                        Подтвердить и войти
+                    </button>
+
+                    <div class="text-center">
+                        <button type="button" id="backToRegister" class="text-sm text-gray-500 hover:text-gray-700 transition">
+                            ← Вернуться к регистрации
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -182,17 +194,26 @@
                 // ============================================
                 // ЭЛЕМЕНТЫ
                 // ============================================
+                const stepRole = document.getElementById('stepRole');
+                const stepRegister = document.getElementById('stepRegister');
+                const stepVerify = document.getElementById('stepVerify');
+
+                const selectClient = document.getElementById('selectClient');
+                const selectBusiness = document.getElementById('selectBusiness');
+                const backToRole = document.getElementById('backToRole');
+                const backToRegister = document.getElementById('backToRegister');
+                const roleLabel = document.getElementById('roleLabel');
+                const selectedRole = document.getElementById('selectedRole');
+                const verifyRole = document.getElementById('verifyRole');
+
                 const registerBtn = document.getElementById('registerBtn');
                 const verifyBtn = document.getElementById('verifyBtn');
                 const resendBtn = document.getElementById('resendCodeBtn');
-                const backBtn = document.getElementById('backToRegister');
-                const stepRegister = document.getElementById('stepRegister');
-                const stepVerify = document.getElementById('stepVerify');
+
                 const smsCode = document.getElementById('sms_code');
                 const smsError = document.getElementById('smsError');
                 const smsSuccess = document.getElementById('smsSuccess');
 
-                // Поля формы
                 const nameInput = document.getElementById('name');
                 const phoneInput = document.getElementById('phone');
                 const emailInput = document.getElementById('email');
@@ -200,7 +221,6 @@
                 const passwordConfirmInput = document.getElementById('password_confirmation');
                 const termsInput = document.getElementById('terms');
 
-                // Элементы для ошибок
                 const nameError = document.getElementById('nameError');
                 const phoneError = document.getElementById('phoneError');
                 const emailError = document.getElementById('emailError');
@@ -210,6 +230,33 @@
                 let tempUserData = {};
                 let resendTimer = null;
                 let resendSeconds = 0;
+                let selectedRoleValue = 'client';
+
+                // ============================================
+                // ВЫБОР РОЛИ
+                // ============================================
+                selectClient.addEventListener('click', function() {
+                    selectedRoleValue = 'client';
+                    selectedRole.value = 'client';
+                    roleLabel.innerHTML = 'Регистрация как <span class="font-semibold text-indigo-600">Клиент</span>';
+                    stepRole.classList.add('hidden');
+                    stepRegister.classList.remove('hidden');
+                    nameInput.focus();
+                });
+
+                selectBusiness.addEventListener('click', function() {
+                    selectedRoleValue = 'business';
+                    selectedRole.value = 'business';
+                    roleLabel.innerHTML = 'Регистрация как <span class="font-semibold text-indigo-600">Бизнес</span>';
+                    stepRole.classList.add('hidden');
+                    stepRegister.classList.remove('hidden');
+                    nameInput.focus();
+                });
+
+                backToRole.addEventListener('click', function() {
+                    stepRegister.classList.add('hidden');
+                    stepRole.classList.remove('hidden');
+                });
 
                 // ============================================
                 // ПОКАЗАТЬ/СКРЫТЬ ПАРОЛЬ
@@ -227,12 +274,10 @@
                 registerBtn.addEventListener('click', function(e) {
                     e.preventDefault();
 
-                    // Скрываем старые ошибки
                     [nameError, phoneError, emailError, passwordError, passwordConfirmationError].forEach(el => {
                         if (el) el.classList.add('hidden');
                     });
 
-                    // Проверка чекбокса
                     if (!termsInput.checked) {
                         alert('Пожалуйста, примите условия использования');
                         return;
@@ -244,9 +289,9 @@
                         email: emailInput.value.trim(),
                         password: passwordInput.value,
                         password_confirmation: passwordConfirmInput.value,
+                        role: selectedRoleValue,
                     };
 
-                    // Валидация
                     if (!data.name) {
                         nameError.textContent = 'Введите имя';
                         nameError.classList.remove('hidden');
@@ -295,6 +340,7 @@
                                 document.getElementById('verifyName').value = data.name;
                                 document.getElementById('verifyEmail').value = data.email;
                                 document.getElementById('verifyPassword').value = data.password;
+                                document.getElementById('verifyRole').value = data.role;
                                 document.getElementById('verifyPhoneDisplay').textContent = data.phone;
 
                                 stepRegister.classList.add('hidden');
@@ -302,7 +348,6 @@
                                 setTimeout(() => smsCode.focus(), 300);
                                 startResendTimer(60);
 
-                                // Показываем код в консоли для теста
                                 if (result.code) {
                                     console.log('📱 Ваш код:', result.code);
                                 }
@@ -358,6 +403,7 @@
                             name: tempUserData.name,
                             email: tempUserData.email,
                             password: tempUserData.password,
+                            role: tempUserData.role,
                         })
                     })
                         .then(response => response.json())
@@ -409,6 +455,7 @@
                             email: tempUserData.email,
                             password: tempUserData.password,
                             password_confirmation: tempUserData.password,
+                            role: tempUserData.role,
                         })
                     })
                         .then(response => response.json())
@@ -469,7 +516,7 @@
                 // ============================================
                 // ВОЗВРАТ К РЕГИСТРАЦИИ
                 // ============================================
-                backBtn.addEventListener('click', function() {
+                backToRegister.addEventListener('click', function() {
                     stepVerify.classList.add('hidden');
                     stepRegister.classList.remove('hidden');
                     if (resendTimer) clearInterval(resendTimer);
@@ -477,7 +524,7 @@
                 });
 
                 // ============================================
-                // ENTER КЛАВИША ДЛЯ ФОРМ
+                // ENTER КЛАВИША
                 // ============================================
                 document.getElementById('registerForm').addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {

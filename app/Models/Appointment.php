@@ -29,6 +29,8 @@ class Appointment extends Model
         'completed_at',
         'cancelled_at',
         'reminder_sent_at',
+        'client_phone',
+        'client_name',
     ];
 
     protected $casts = [
@@ -175,4 +177,12 @@ class Appointment extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    // Генерация номера заявки
+    public static function generateBookingNumber(): string
+    {
+        return 'BK-' . date('Ymd') . '-' . strtoupper(uniqid());
+    }
+
+
 }

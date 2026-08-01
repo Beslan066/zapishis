@@ -44,6 +44,7 @@
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th class="pb-3">№ заявки</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
@@ -58,6 +59,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <div>{{ $appointment->start_time->format('d.m.Y') }}</div>
                                 <div class="text-gray-500">{{ $appointment->start_time->format('H:i') }} - {{ $appointment->end_time->format('H:i') }}</div>
+                            </td>
+                            <td class="py-3 text-sm font-medium text-gray-900">
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full">{{ $appointment->booking_number }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">

@@ -10,13 +10,19 @@ use Illuminate\Support\Str;
 
 class BusinessController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return view('businesses.create');
+        $user = $request->user();
+
+        return view('businesses.create', [
+            'user' => $user,
+        ]);
     }
 
     public function store(Request $request)
     {
+        $user = $request->user();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -27,22 +33,23 @@ class BusinessController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        // Если телефон или email не переданы - берем из профиля
         $business = Business::create([
-            'user_id' => $request->user()->id,
+            'user_id' => $user->id,
             'name' => $validated['name'],
             'slug' => Str::slug($validated['name']) . '-' . uniqid(),
-            'phone' => $validated['phone'],
-            'email' => $validated['email'],
-            'address' => $validated['address'],
-            'city' => $validated['city'],
-            'region' => $validated['region'],
-            'description' => $validated['description'],
+            'phone' => $validated['phone'] ?? $user->phone,
+            'email' => $validated['email'] ?? $user->email,
+            'address' => $validated['address'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'region' => $validated['region'] ?? null,
+            'description' => $validated['description'] ?? null,
             'trial_ends_at' => now()->addDays(30),
         ]);
 
-        $request->user()->update(['current_business_id' => $business->id]);
+        $user->update(['current_business_id' => $business->id]);
 
         return redirect()->route('dashboard')
-            ->with('success', 'Business created successfully!');
+            ->with('success', 'Бизнес создан!');
     }
 }

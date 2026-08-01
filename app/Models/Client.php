@@ -22,6 +22,7 @@ class Client extends Model
         'total_visits',
         'total_spent',
         'last_visit_at',
+        'user_id'
     ];
 
     protected $casts = [
@@ -66,4 +67,10 @@ class Client extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

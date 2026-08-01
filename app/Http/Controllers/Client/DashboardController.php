@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -12,8 +13,22 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // Все записи пользователя
-        $allAppointments = $user->appointments()->with(['business', 'service', 'employee'])->get();
+        $client = Client::where('user_id', $user->id)->first();
+
+        if (!$client) {
+            $client = Client::where('phone', $user->phone)->first();
+            if ($client) {
+                $client->update(['user_id' => $user->id]);
+            }
+        }
+
+        $allAppointments = collect();
+
+        if ($client) {
+            $allAppointments = $client->appointments()
+                ->with(['business', 'service', 'employee'])
+                ->get();
+        }
 
         $stats = [
             'total' => $allAppointments->count(),
@@ -23,20 +38,16 @@ class DashboardController extends Controller
             'companies' => $allAppointments->pluck('business_id')->unique()->count(),
         ];
 
-        $upcomingAppointments = $user->appointments()
-            ->with(['business', 'service', 'employee'])
+        $upcomingAppointments = $allAppointments
             ->where('start_time', '>=', now())
             ->whereIn('status', ['pending', 'confirmed'])
-            ->orderBy('start_time')
-            ->limit(5)
-            ->get();
+            ->sortBy('start_time')
+            ->take(5);
 
-        $historyAppointments = $user->appointments()
-            ->with(['business', 'service', 'employee'])
+        $historyAppointments = $allAppointments
             ->whereIn('status', ['completed', 'cancelled'])
-            ->orderBy('start_time', 'desc')
-            ->limit(5)
-            ->get();
+            ->sortByDesc('start_time')
+            ->take(5);
 
         return view('clients.dashboard', compact('stats', 'upcomingAppointments', 'historyAppointments'));
     }

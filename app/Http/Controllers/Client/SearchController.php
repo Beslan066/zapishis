@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Client/SearchController.php
 
 namespace App\Http\Controllers\Client;
 
@@ -18,10 +19,12 @@ class SearchController extends Controller
         $services = Service::with('business')
             ->where('is_active', true)
             ->when($query, function ($q) use ($query) {
-                return $q->where('name', 'ilike', "%{$query}%")
-                    ->orWhereHas('business', function ($b) use ($query) {
-                        $b->where('name', 'ilike', "%{$query}%");
-                    });
+                return $q->where(function ($sub) use ($query) {
+                    $sub->where('name', 'ilike', "%{$query}%")
+                        ->orWhereHas('business', function ($b) use ($query) {
+                            $b->where('name', 'ilike', "%{$query}%");
+                        });
+                });
             })
             ->when($category, function ($q) use ($category) {
                 return $q->where('category', $category);
@@ -33,6 +36,7 @@ class SearchController extends Controller
             })
             ->paginate(12);
 
+        // Получаем категории из услуг (если есть колонка category)
         $categories = Service::where('is_active', true)
             ->distinct()
             ->pluck('category')

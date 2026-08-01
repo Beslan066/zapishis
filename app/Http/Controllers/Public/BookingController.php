@@ -43,7 +43,7 @@ class BookingController extends Controller
 
         $request->validate([
             'service_id' => 'required|exists:services,id',
-            'employee_id' => 'required|exists:employees,id',
+            'employee_id' => 'nullable|exists:employees,id',
             'date' => 'required|date|after_or_equal:today',
             'time' => 'required|date_format:H:i',
             'first_name' => 'required|string|max:255',
@@ -52,49 +52,66 @@ class BookingController extends Controller
             'email' => 'nullable|email|max:255',
         ]);
 
-        // Проверка доступности слота
         $startTime = Carbon::parse($request->date . ' ' . $request->time);
         $service = $business->services()->find($request->service_id);
         $endTime = $startTime->copy()->addMinutes($service->duration_minutes);
 
-        $isAvailable = $this->appointmentService->isSlotAvailable(
-            $request->employee_id,
-            $startTime,
-            $endTime
-        );
+        // Проверка доступности если выбран сотрудник
+        if ($request->employee_id) {
+            $isAvailable = $this->appointmentService->isSlotAvailable(
+                $request->employee_id,
+                $startTime,
+                $endTime
+            );
 
-        if (!$isAvailable) {
-            return back()->with('error', 'Выбранное время занято. Пожалуйста, выберите другое время.');
+            if (!$isAvailable) {
+                return back()->with('error', 'Выбранное время занято')->withInput();
+            }
         }
 
-        // Поиск или создание клиента
-        $client = Client::firstOrCreate(
-            ['phone' => $request->phone, 'business_id' => $business->id],
-            [
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'business_id' => $business->id,
-            ]
-        );
+        // Ищем клиента в базе по телефону
+        $client = Client::where('phone', $request->phone)
+            ->where('business_id', $business->id)
+            ->first();
 
-        // Создание записи
+        $clientId = $client?->id;
+        $guestName = null;
+        $guestPhone = null;
+
+        // Если клиент не найден - создаем гостевую запись
+        if (!$client) {
+            $guestName = $request->first_name . ($request->last_name ? ' ' . $request->last_name : '');
+            $guestPhone = $request->phone;
+        }
+
+        // Генерируем номер заявки
+        $bookingNumber = Appointment::generateBookingNumber();
+
         $appointmentData = [
             'business_id' => $business->id,
-            'client_id' => $client->id,
+            'client_id' => $clientId,
             'employee_id' => $request->employee_id,
             'service_id' => $request->service_id,
-            'created_by_user_id' => Auth::id() ?? $client->id,
+            'created_by_user_id' => Auth::id() ?? null,
             'start_time' => $startTime,
             'end_time' => $endTime,
             'price' => $service->price,
             'status' => 'pending',
+            'booking_number' => $bookingNumber,
+            'guest_name' => $guestName,
+            'guest_phone' => $guestPhone,
+            'notes' => $request->notes ?? null,
         ];
 
-        $appointment = $this->appointmentService->createAppointment($appointmentData);
+        // Если есть email, добавляем в notes для гостя
+        if ($request->email && !$client) {
+            $appointmentData['notes'] = ($appointmentData['notes'] ?? '') . "\nEmail: " . $request->email;
+        }
+
+        $appointment = Appointment::create($appointmentData);
 
         return redirect()->route('public.booking', $slug)
-            ->with('success', 'Запись успешно создана! Мы отправили подтверждение на ваш телефон.');
+            ->with('success', "Запись создана! Номер заявки: {$bookingNumber}. Мы отправили подтверждение на ваш телефон.");
     }
 
     public function availableSlots(Request $request)
@@ -105,10 +122,12 @@ class BookingController extends Controller
             'service_id' => 'required|exists:services,id',
         ]);
 
+        $service = \App\Models\Service::find($request->service_id);
+
         $slots = $this->appointmentService->getAvailableSlots(
             $request->employee_id,
             $request->date,
-            Service::find($request->service_id)->duration_minutes
+            $service->duration_minutes
         );
 
         return response()->json($slots);

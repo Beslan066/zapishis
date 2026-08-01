@@ -25,6 +25,10 @@ Route::get('/', function () {
     return view('welcome', compact('businesses'));
 })->name('home');
 
+
+Route::post('/login/send-code', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'sendCode'])->name('login.send-code');
+Route::post('/login/verify', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'verify'])->name('login.verify');
+
 // Публичные страницы компаний
 Route::get('/companies', [App\Http\Controllers\Public\CompanyController::class, 'index'])->name('public.companies');
 Route::get('/company/{businessSlug}', [App\Http\Controllers\Public\CompanyController::class, 'show'])->name('public.company');

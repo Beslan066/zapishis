@@ -75,7 +75,9 @@ class AppointmentController extends Controller
         $business = $this->getBusiness($request);
 
         $validator = Validator::make($request->all(), [
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'nullable|exists:clients,id',
+            'client_phone' => 'nullable|string|max:20',
+            'client_name' => 'nullable|string|max:255',
             'employee_id' => 'nullable|exists:employees,id',
             'service_id' => 'required|exists:services,id',
             'date' => 'required|date|after_or_equal:today',
@@ -88,15 +90,12 @@ class AppointmentController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        Log::info('Validation passed');
-
-        $client = $business->clients()->findOrFail($request->client_id);
         $service = $business->services()->findOrFail($request->service_id);
 
         $startTime = Carbon::parse($request->date . ' ' . $request->time);
         $endTime = $startTime->copy()->addMinutes($service->duration_minutes);
 
-        // Проверяем доступность только если выбран сотрудник
+        $employee = null;
         if ($request->employee_id) {
             $employee = $business->employees()->find($request->employee_id);
 
@@ -113,15 +112,73 @@ class AppointmentController extends Controller
             if (!$isAvailable) {
                 return back()->with('error', 'Выбранное время занято')->withInput();
             }
-        } else {
-            // Если сотрудник не выбран - создаем запись без сотрудника
-            $employee = null;
+        }
+
+        // ============================================
+        // ЛОГИКА РАБОТЫ С КЛИЕНТОМ
+        // ============================================
+
+        $clientId = null;
+        $clientPhone = null;
+        $clientName = null;
+
+        if ($request->client_id) {
+            // 1. Если выбран существующий клиент из базы
+            $client = $business->clients()->find($request->client_id);
+            if ($client) {
+                $clientId = $client->id;
+            }
+        } elseif ($request->client_phone) {
+            // 2. Если введен телефон - ищем клиента в базе или сохраняем телефон для привязки
+            $clientPhone = $request->client_phone;
+            $clientName = $request->client_name ?? 'Гость';
+
+            // Проверяем, есть ли уже клиент с таким телефоном
+            $existingClient = $business->clients()
+                ->where('phone', $clientPhone)
+                ->first();
+
+            if ($existingClient) {
+                // Нашли клиента - привязываем
+                $clientId = $existingClient->id;
+                $clientPhone = null; // не храним телефон, т.к. клиент уже в базе
+            } else {
+                // Клиента нет - сохраняем телефон для будущей привязки
+                // Также проверяем, есть ли зарегистрированный пользователь с таким телефоном
+                $user = \App\Models\User::where('phone', $clientPhone)->first();
+
+                if ($user) {
+                    // Пользователь зарегистрирован, но не является клиентом этого бизнеса
+                    // Создаем клиента в этом бизнесе
+                    $newClient = $business->clients()->create([
+                        'first_name' => $clientName,
+                        'phone' => $clientPhone,
+                        'email' => $user->email ?? null,
+                    ]);
+                    $clientId = $newClient->id;
+                    $clientPhone = null;
+                }
+            }
+        }
+
+        // Если клиент не найден и не создан - сохраняем телефон для привязки позже
+        if (!$clientId && $clientPhone) {
+            // Проверяем, есть ли клиент с таким телефоном в этом бизнесе
+            $existingClient = $business->clients()
+                ->where('phone', $clientPhone)
+                ->first();
+
+            if ($existingClient) {
+                $clientId = $existingClient->id;
+                $clientPhone = null;
+            }
         }
 
         try {
             $appointmentData = [
                 'business_id' => $business->id,
-                'client_id' => $client->id,
+                'client_id' => $clientId,
+                'employee_id' => $employee?->id,
                 'service_id' => $service->id,
                 'created_by_user_id' => auth()->id(),
                 'start_time' => $startTime,
@@ -129,19 +186,21 @@ class AppointmentController extends Controller
                 'price' => $service->price,
                 'notes' => $request->notes,
                 'status' => 'pending',
+                'client_phone' => $clientPhone,
+                'client_name' => $clientName,
             ];
-
-            // Добавляем employee_id только если он есть
-            if ($employee) {
-                $appointmentData['employee_id'] = $employee->id;
-            }
 
             $appointment = Appointment::create($appointmentData);
 
             Log::info('Appointment created successfully', ['id' => $appointment->id]);
 
+            $message = 'Запись создана!';
+            if ($clientPhone && !$clientId) {
+                $message .= ' Клиент не зарегистрирован на платформе. При регистрации записи автоматически привяжутся.';
+            }
+
             return redirect()->route('appointments.index')
-                ->with('success', 'Запись создана!');
+                ->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Appointment creation failed: ' . $e->getMessage());
             return back()->with('error', 'Ошибка создания записи: ' . $e->getMessage());

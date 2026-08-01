@@ -20,14 +20,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->foreignId('current_business_id')->nullable()->constrained('businesses');
+            $table->foreignId('current_business_id')->nullable();
             $table->json('settings')->nullable();
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
             $table->timestamps();
             $table->softDeletes();
 
@@ -35,15 +29,11 @@ return new class extends Migration
         });
     }
 
-
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };

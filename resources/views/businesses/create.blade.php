@@ -7,7 +7,9 @@
         <div class="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/50 shadow-xl shadow-gray-100/50">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
                 </div>
                 <h1 class="text-2xl font-extrabold text-gray-900">Создать бизнес</h1>
             </div>
@@ -16,6 +18,7 @@
                 @csrf
 
                 <div class="space-y-4">
+                    <!-- Название -->
                     <div>
                         <label for="name" class="block text-sm font-semibold text-gray-700 mb-1.5">Название бизнеса *</label>
                         <input type="text" name="name" id="name" value="{{ old('name') }}" required
@@ -26,28 +29,33 @@
                         @enderror
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1.5">Телефон</label>
-                            <input type="text" name="phone" id="phone" value="{{ old('phone') }}"
-                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                   placeholder="+7 999 123 45 67">
-                            @error('phone')
-                            <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-                            <input type="email" name="email" id="email" value="{{ old('email') }}"
-                                   class="w-full px-4 py-3 bg-gray-50/80 border border-gray-200/80 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition outline-none"
-                                   placeholder="example@mail.com">
-                            @error('email')
-                            <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <!-- Телефон (автоматически из профиля) -->
+                    <div>
+                        <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1.5">Телефон</label>
+                        <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}"
+                               class="w-full px-4 py-3 bg-gray-100/80 border border-gray-200/80 rounded-2xl text-gray-500 cursor-not-allowed"
+                               readonly disabled>
+                        <input type="hidden" name="phone" value="{{ $user->phone }}">
+                        <p class="mt-1 text-xs text-gray-400">Телефон из вашего профиля</p>
+                        @error('phone')
+                        <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
+                    <!-- Email (автоматически из профиля) -->
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                        <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
+                               class="w-full px-4 py-3 bg-gray-100/80 border border-gray-200/80 rounded-2xl text-gray-500 cursor-not-allowed"
+                               readonly disabled>
+                        <input type="hidden" name="email" value="{{ $user->email }}">
+                        <p class="mt-1 text-xs text-gray-400">Email из вашего профиля</p>
+                        @error('email')
+                        <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Адрес -->
                     <div>
                         <label for="address" class="block text-sm font-semibold text-gray-700 mb-1.5">Адрес</label>
                         <input type="text" name="address" id="address" value="{{ old('address') }}"
