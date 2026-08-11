@@ -1,13 +1,22 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Appointment;
 use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class AppointmentService
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function getAvailableSlots(
         int $employeeId,
         string $date,
@@ -16,7 +25,6 @@ class AppointmentService
     ): Collection {
         $employee = Employee::findOrFail($employeeId);
 
-        // Get working hours for this day
         $dayOfWeek = Carbon::parse($date)->format('l');
         $workingHour = $employee->workingHours()->where('day_of_week', $dayOfWeek)->first();
 
@@ -27,7 +35,6 @@ class AppointmentService
         $start = Carbon::parse($date . ' ' . $workingHour->start_time);
         $end = Carbon::parse($date . ' ' . $workingHour->end_time);
 
-        // Get existing appointments for this day
         $appointments = Appointment::where('employee_id', $employeeId)
             ->whereDate('start_time', $date)
             ->where('status', '!=', 'cancelled')
@@ -62,7 +69,7 @@ class AppointmentService
                 ]);
             }
 
-            $current->addMinutes(15); // Step by 15 minutes
+            $current->addMinutes(15);
         }
 
         return $slots;
@@ -70,11 +77,10 @@ class AppointmentService
 
     public function createAppointment(array $data): Appointment
     {
-        // Validate slot is available
         $slots = $this->getAvailableSlots(
-            $data['employee_id'],
+            $data['employee_id'] ?? null,
             Carbon::parse($data['start_time'])->format('Y-m-d'),
-            $data['duration_minutes'],
+            $data['duration_minutes'] ?? 60,
         );
 
         $selectedSlot = $slots->first(function ($slot) use ($data) {
@@ -87,23 +93,8 @@ class AppointmentService
 
         $appointment = Appointment::create($data);
 
-        $client->notify(
-            "Ваша запись подтверждена!\nУслуга: {$service->name}\nДата: {$startTime->format('d.m.Y H:i')}\nМастер: {$employee->name}",
-            'appointment_confirmation',
-            'sms',
-            'Подтверждение записи',
-            [
-                'appointment_id' => $appointment->id,
-                'service' => $service->name,
-                'date' => $startTime->format('d.m.Y H:i'),
-                'employee' => $employee->name,
-            ]
-        );
-
-        // Send notifications
-        app(NotificationService::class)->sendAppointmentConfirmation($appointment);
-
-
+        // Отправляем уведомление
+        $this->notificationService->sendAppointmentCreated($appointment);
 
         return $appointment;
     }
@@ -116,18 +107,7 @@ class AppointmentService
             'cancelled_at' => now(),
         ]);
 
-        $appointment->client->notify(
-            "Запись отменена: {$appointment->service->name} на {$appointment->start_time->format('d.m.Y H:i')}",
-            'appointment_cancellation',
-            'sms',
-            'Отмена записи',
-            [
-                'appointment_id' => $appointment->id,
-                'reason' => $reason,
-            ]
-        );
-
-        app(NotificationService::class)->sendAppointmentCancellation($appointment);
+        $this->notificationService->sendAppointmentCancelled($appointment);
     }
 
     public function getUpcomingAppointments(int $businessId, int $days = 7): Collection
@@ -147,16 +127,27 @@ class AppointmentService
             return;
         }
 
-        $appointment->client->notify(
-            "Напоминание о записи!\nУслуга: {$appointment->service->name}\nЗавтра в {$appointment->start_time->format('H:i')}",
-            'appointment_reminder',
-            'sms',
-            'Напоминание о записи',
-            [
-                'appointment_id' => $appointment->id,
-            ]
-        );
-
+        $this->notificationService->sendAppointmentReminder($appointment);
         $appointment->update(['reminder_sent_at' => now()]);
+    }
+
+    public function isSlotAvailable(int $employeeId, Carbon $startTime, Carbon $endTime, ?int $excludeAppointmentId = null): bool
+    {
+        $overlapping = Appointment::where('employee_id', $employeeId)
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($q) use ($startTime, $endTime) {
+                        $q->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
+            })
+            ->when($excludeAppointmentId, function ($query, $id) {
+                return $query->where('id', '!=', $id);
+            })
+            ->exists();
+
+        return !$overlapping;
     }
 }
