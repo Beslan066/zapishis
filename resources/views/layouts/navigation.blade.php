@@ -36,19 +36,19 @@
                         <!-- КЛИЕНТСКАЯ НАВИГАЦИЯ -->
                         <div class="hidden md:flex items-center gap-1">
                             <a href="{{ route('client.dashboard') }}" class="px-4 py-2 rounded-xl text-md font-medium {{ request()->routeIs('client.dashboard') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900' }} transition">
-                                🏠 Главная
+                                Главная
                             </a>
                             <a href="{{ route('client.search') }}" class="px-4 py-2 rounded-xl text-md font-medium {{ request()->routeIs('client.search') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900' }} transition">
-                                🔍 Поиск
+                                Поиск
                             </a>
                             <a href="{{ route('public.companies') }}" class="px-4 py-2 rounded-xl text-md font-medium {{ request()->routeIs('public.companies') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900' }} transition">
-                                🏢 Компании
+                                Компании
                             </a>
                             <a href="{{ route('client.appointments') }}" class="px-4 py-2 rounded-xl text-md font-medium {{ request()->routeIs('client.appointments') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900' }} transition">
-                                📅 Мои записи
+                                Мои записи
                             </a>
                             <a href="{{ route('client.history') }}" class="px-4 py-2 rounded-xl text-md font-medium {{ request()->routeIs('client.history') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900' }} transition">
-                                📋 История
+                                История
                             </a>
                         </div>
                     @endif

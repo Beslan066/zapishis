@@ -74,7 +74,7 @@
         <!-- Список записей -->
         <div class="bg-white/70 backdrop-blur-xl rounded-3xl p-6 border border-white/50 shadow-xl shadow-gray-100/50">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900">📅 Записи на сегодня</h3>
+                <h3 class="text-lg font-bold text-gray-900">Записи на сегодня</h3>
                 <a href="{{ route('appointments.index') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">Все записи →</a>
             </div>
 

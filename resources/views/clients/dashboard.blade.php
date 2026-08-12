@@ -14,7 +14,6 @@
                     <p class="text-gray-500 mt-1">Вот ваши последние записи и активность</p>
                 </div>
                 <a href="{{ route('public.companies') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 transition-all hover:scale-[1.02]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                     Найти компанию
                 </a>
             </div>
@@ -74,7 +73,7 @@
         <!-- Предстоящие записи -->
         <div class="bg-white/70 backdrop-blur-xl rounded-3xl p-6 border border-white/50 shadow-xl shadow-gray-100/50">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900">📅 Предстоящие записи</h3>
+                <h3 class="text-lg font-bold text-gray-900">Предстоящие записи</h3>
                 <a href="{{ route('client.appointments') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">Все записи →</a>
             </div>
 
