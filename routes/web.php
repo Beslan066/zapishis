@@ -34,6 +34,18 @@ Route::get('/companies', [App\Http\Controllers\Public\CompanyController::class, 
 Route::get('/company/{businessSlug}', [App\Http\Controllers\Public\CompanyController::class, 'show'])->name('public.company');
 Route::get('/booking/{businessSlug}', [App\Http\Controllers\Public\BookingController::class, 'index'])->name('public.booking');
 Route::post('/booking/{businessSlug}', [App\Http\Controllers\Public\BookingController::class, 'store'])->name('public.booking.store');
+Route::get('/terms-of-service', function () {
+    return view('public.terms-of-service');
+})->name('public.terms-of-service');
+Route::get('/privacy-policy', function () {
+    return view('public.privacy-policy');
+})->name('public.privacyPolicy');
+Route::get('/offer', function () {
+    return view('public.offer');
+})->name('public.offer');
+Route::get('/soglasie-na-obrabotku-personalnykh-dannykh', function () {
+    return view('public.soglasie-na-obrabotku-personalnykh-dannykh');
+});
 
 // ============================================
 // РЕГИСТРАЦИЯ С SMS (ПУБЛИЧНЫЕ МАРШРУТЫ)
